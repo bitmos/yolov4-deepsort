@@ -91,7 +91,12 @@ def main(_argv):
         out = cv2.VideoWriter(FLAGS.output, codec, fps, (width, height))
 
     frame_num = 0
+    ids=[]
+    starttime={}
+    endtime={}
     # while video is running
+    count=0
+    a=[]
     while True:
         return_value, frame = vid.read()
         if return_value:
@@ -199,13 +204,31 @@ def main(_argv):
         # Call the tracker
         tracker.predict()
         tracker.update(detections)
+        for track in tracker.tracks:
+          temp=[track.track_id]
 
+        count+=1
+        a.append(temp)
         # update tracks
         for track in tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue 
             bbox = track.to_tlbr()
             class_name = track.get_class()
+            
+            
+            
+            if track.track_id not in ids:
+              ids.append(track.track_id)
+              starttime[track.track_id]=vid.get(cv2.CAP_PROP_POS_MSEC)
+            if track.track_id not in a[0] and count!=1:
+              endtime[track.track_id]=vid.get(cv2.CAP_PROP_POS_MSEC)
+            else:
+              endtime[track.track_id]=vid.get(cv2.CAP_PROP_POS_MSEC)
+
+
+              
+
             
         # draw bbox on screen
             color = colors[int(track.track_id) % len(colors)]
@@ -231,6 +254,11 @@ def main(_argv):
         if FLAGS.output:
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
+        if count!=1:
+           a.pop(0)
+    for i in ids:
+      print("ID,START TIME,END TIME",i,starttime[i]/1000,endtime[i]/1000)
+
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
