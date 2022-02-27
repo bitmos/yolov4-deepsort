@@ -257,7 +257,7 @@ def main(_argv):
         if count!=1:
            a.pop(0)
     for i in ids:
-      print("ID,START TIME,END TIME",i,starttime[i]/1000,endtime[i]/1000)
+      print("ID,START TIME,END TIME",i,str(int(starttime[i]/1000))+"Sec",str(int(endtime[i]/1000))+"Sec")
 
     cv2.destroyAllWindows()
 
